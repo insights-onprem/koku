@@ -83,7 +83,6 @@ celerybeat.pid
 *.sage.py
 
 # dotenv
-.env
 .env.test
 openshift/parameters/*.env
 

@@ -1,0 +1,42 @@
+version: "3.8"
+
+# Add external network reference
+networks:
+  scripts_default:
+    external: true
+
+# Override ALL services to use both default and scripts_default networks
+services:
+  koku-base:
+    networks:
+      - default
+      - scripts_default
+
+  koku-server:
+    networks:
+      - default
+      - scripts_default
+
+  masu-server:
+    networks:
+      - default
+      - scripts_default
+
+  koku-worker:
+    networks:
+      - default
+      - scripts_default
+
+  koku-listener:
+    environment:
+      - RETAIN_NUM_MONTHS=1200
+    networks:
+      - default
+      - scripts_default
+
+  unleash:
+    networks:
+      - default
+      - scripts_default
+
+  # Add any other services you have...
