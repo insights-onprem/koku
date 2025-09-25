@@ -34,9 +34,18 @@ services:
       - default
       - scripts_default
 
+  redis:
+    image: quay.io/insights-onprem/redis-ephemeral:6
+
   unleash:
+    image: quay.io/ydayagi/unleashorg/unleash-server:latest
     networks:
       - default
       - scripts_default
 
+  minio:
+    image: quay.io/minio/minio:RELEASE.2025-01-20T14-49-07Z
+
+  create-parquet-bucket:
+    image: quay.io/minio/mc:latest
   # Add any other services you have...

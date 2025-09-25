@@ -1,4 +1,4 @@
-FROM postgres:16
+FROM image: quay.io/insights-onprem/postgresql:16
 
 ARG USER_ID=999
 ARG GROUP_ID=999
