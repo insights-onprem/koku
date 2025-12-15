@@ -4,7 +4,17 @@ set -ex
 IMAGE="quay.io/redhat-services-prod/cost-mgmt-dev-tenant/koku"
 APP_NAME="hccm"  # name of app-sre "application" folder this component lives in
 COMPONENT_NAME="koku"  # name of app-sre "resourceTemplate" in deploy.yaml for this component
-COMPONENTS="koku trino"  # specific components to deploy (optional, default: all)
+
+# Set components based on ONPREM mode
+# For ONPREM deployments, only deploy koku (no Trino)
+if [ "${ONPREM:-false}" = "true" ]; then
+    COMPONENTS="koku"
+    echo "ONPREM mode: Deploying koku only (no Trino)"
+else
+    COMPONENTS="koku trino"
+    echo "Standard mode: Deploying koku and trino"
+fi
+
 IQE_PLUGINS="cost_management"
 IQE_MARKER_EXPRESSION="cost_smoke"
 IQE_FILTER_EXPRESSION=""
@@ -30,6 +40,13 @@ oc get secret koku-gcp -o yaml -n ephemeral-base | grep -v '^\s*namespace:\s' | 
 
 IQE_IBUTSU_SOURCE="cost-ephemeral-${IMAGE_TAG}"
 
+# Build Trino-specific parameters only if not in ONPREM mode
+if [ "${ONPREM:-false}" = "true" ]; then
+    TRINO_PARAMS=""
+else
+    TRINO_PARAMS="--set-parameter trino/HIVE_PROPERTIES_FILE=glue.properties --set-parameter trino/GLUE_PROPERTIES_FILE=hive.properties"
+fi
+
 bonfire deploy \
     ${APP_NAME} \
     --source=appsre \
@@ -42,8 +59,7 @@ bonfire deploy \
     --no-single-replicas \
     --set-parameter rbac/MIN_REPLICAS=1 \
     --set-parameter koku/SCHEMA_SUFFIX=_${BUILD_NUMBER} \
-    --set-parameter trino/HIVE_PROPERTIES_FILE=glue.properties \
-    --set-parameter trino/GLUE_PROPERTIES_FILE=hive.properties \
+    ${TRINO_PARAMS} \
     ${COMPONENTS_ARG} \
     ${COMPONENTS_RESOURCES_ARG} \
     ${EXTRA_DEPLOY_ARGS}
