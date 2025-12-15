@@ -90,7 +90,7 @@ class AzureReportDBAccessor(SQLScriptAtomicExecutorMixin, ReportDBAccessorBase):
             (None)
 
         """
-        sql = pkgutil.get_data("masu.database", "trino_sql/reporting_azurecostentrylineitem_daily_summary.sql")
+        sql = pkgutil.get_data("masu.database", f"{self.get_sql_folder_name()}/reporting_azurecostentrylineitem_daily_summary.sql")
         sql = sql.decode("utf-8")
         uuid_str = str(uuid.uuid4()).replace("-", "_")
         sql_params = {
@@ -209,7 +209,7 @@ class AzureReportDBAccessor(SQLScriptAtomicExecutorMixin, ReportDBAccessorBase):
         days_tup = tuple(str(day.day) for day in days)
 
         for table_name in tables:
-            sql = pkgutil.get_data("masu.database", f"trino_sql/azure/openshift/{table_name}.sql")
+            sql = pkgutil.get_data("masu.database", f"{self.get_sql_folder_name()}/azure/openshift/{table_name}.sql")
             sql = sql.decode("utf-8")
             sql_params = {
                 "schema": self.schema,
@@ -274,7 +274,7 @@ class AzureReportDBAccessor(SQLScriptAtomicExecutorMixin, ReportDBAccessorBase):
             bill_id,
             report_period_id,
         )
-        managed_path = "trino_sql/azure/openshift/populate_daily_summary"
+        managed_path = f"{self.get_sql_folder_name()}/azure/openshift/populate_daily_summary"
         prepare_sql, prepare_params = sql_metadata.prepare_template(
             f"{managed_path}/0_prepare_daily_summary_tables.sql"
         )
@@ -358,7 +358,7 @@ class AzureReportDBAccessor(SQLScriptAtomicExecutorMixin, ReportDBAccessorBase):
         self, azure_source_uuid, ocp_source_uuids, start_date, end_date, **kwargs
     ):
         """Return a list of matched tags."""
-        sql = pkgutil.get_data("masu.database", "trino_sql/reporting_ocpazure_matched_tags.sql")
+        sql = pkgutil.get_data("masu.database", f"{self.get_sql_folder_name()}/reporting_ocpazure_matched_tags.sql")
         sql = sql.decode("utf-8")
 
         days = self.date_helper.list_days(start_date, end_date)
